@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+SECRET=$(gpg --quiet --decrypt "$HOME/.otp_secrets/$1.gpg") || exit
+oathtool --totp -b "$SECRET" | tee >(pbcopy)

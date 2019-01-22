@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# List all backups available
+
+if [ "$1" == 'local' ]; then
+  pushd "$HOME/.wag" > /dev/null || exit
+  ls -1 -- *.tar 2> /dev/null
+  popd > /dev/null || exit
+else
+  ssh mini2.local ls /opt/backups/database/ | grep -e '.tar$'
+fi

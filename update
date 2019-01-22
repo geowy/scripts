@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# Update all command line tools
+
+echo '+------------+'
+echo '|   MAC OS   |'
+echo '+------------+'
+# Just list macOS updates since they could take a while to install
+softwareupdate --list
+
+echo
+echo '+--------------+'
+echo '|   HOMEBREW   |'
+echo '+--------------+'
+brew update && brew upgrade
+brew doctor
+
+echo
+echo '+--------------+'
+echo '|   DOTFILES   |'
+echo '+--------------+'
+git -C ~/.dotfiles pull && ~/.dotfiles/install
+
+echo
+echo '+------------+'
+echo '|   NEOVIM   |'
+echo '+------------+'
+pip3 install --upgrade --quiet pynvim
+nvim +PlugUpgrade +qall && echo 'Plug updated!'
+nvim +PlugInstall +qall && echo 'Plugins installed!'
+nvim +PlugUpdate +qall && echo 'Plugins upgraded!'

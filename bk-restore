@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+# Download and restore a backup
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+  echo "USAGE:"
+  echo "bk-restore FILE DATABASE"
+  exit
+fi
+
+BACKUP_DIR="$HOME/.wag"
+BACKUP="$BACKUP_DIR/$1"
+if [ ! -e "$BACKUP" ]; then
+  mkdir -p "$BACKUP_DIR"
+  scp "mini2.local:/opt/backups/database/$1" "$BACKUP_DIR"
+fi
+
+TMP_DIR="$HOME/.wag/tmp"
+rm -rf "$TMP_DIR"
+mkdir -p "$TMP_DIR"
+tar -C "$TMP_DIR" -xf "$BACKUP"
+
+SQL_FILE="$(find "$TMP_DIR" -name "*.sql")"
+if [ "$(psql -l | grep -c "$2")" = 0 ]; then
+  createdb "$2"
+fi
+pg_restore --dbname="$2" --clean --jobs=6 --no-owner "$SQL_FILE"
+
+rm -rf "$TMP_DIR"
